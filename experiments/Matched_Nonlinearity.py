@@ -17,7 +17,7 @@ np.random.seed(GLOBAL_SEED)
 
 OUTPUT_DIR = Path("../results")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-EXCEL_PATH = OUTPUT_DIR / "matched_nonlinearity_transform_mismatch_n2000_p50_a10.xlsx"
+EXCEL_PATH = OUTPUT_DIR / "matched_nonlinearity_transform_mismatch_n5000_p50_a10.xlsx"
 
 
 def make_target_continuous(signal, noise, signal_scale=1.0, intercept=0.0, w=None):
@@ -212,7 +212,7 @@ def fit_ann(X_train, X_test, y_train, y_test, seed):
 
 MODEL_FITTERS = {"xgb": fit_xgb, "ann": fit_ann}
 
-N = 2000
+N = 5000
 P = 50
 N_ACTIVE = 10
 N_REPS = 25
