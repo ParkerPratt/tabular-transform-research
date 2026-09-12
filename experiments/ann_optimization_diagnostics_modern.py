@@ -14,7 +14,7 @@ from sklearn.preprocessing import StandardScaler
 GLOBAL_SEED = 42
 np.random.seed(GLOBAL_SEED)
 
-OUTPUT_DIR = Path("ExperimentalDesignResults")
+OUTPUT_DIR = Path("../results")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 EXCEL_PATH = OUTPUT_DIR / "ann_optimization_diagnostics_modern_mismatch.xlsx"
 
