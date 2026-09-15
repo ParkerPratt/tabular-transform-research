@@ -42,7 +42,7 @@ baseline %>%
   facet_wrap(~ model+n)
 
 hermite = read.csv("../results/hermite_metrics.csv")
-
+curvature = read.csv("../results/curvature_metrics.csv")
 analysis = raw %>%
   group_by(
     n, transform, strength,
@@ -57,6 +57,10 @@ analysis = raw %>%
   left_join(
     hermite,
     by = c("transform", "strength")
+  )%>%
+  left_join(
+    curvature,
+    by = c("transform", "strength")
   )
 
 ObservedDegrade = analysis %>%
@@ -67,7 +71,8 @@ ObservedDegrade = analysis %>%
     starts_with("c"),
     starts_with("energy"),
     higher_order_energy,
-    weighted_higher_order_energy
+    weighted_higher_order_energy,
+    curvature
   ) %>%
   pivot_wider(
     names_from = observed_representation,
@@ -91,4 +96,12 @@ fitlinear = lm(
     filter(model == "ann")
 )
 summary(fitlinear)
+
+curvefit = lm(
+  degradation ~ log(n) + curvature + energy1,
+  data = ObservedDegrade %>%
+    filter(model == "ann")
+)
+
+summary(curvefit)
 
