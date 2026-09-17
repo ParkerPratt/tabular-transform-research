@@ -25,7 +25,7 @@ np.random.seed(GLOBAL_SEED)
 
 OUTPUT_DIR = Path("../results")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-EXCEL_PATH = OUTPUT_DIR / "matched_nonlinearity_resnet_n500_p50_a10.xlsx"
+EXCEL_PATH = OUTPUT_DIR / "matched_nonlinearity_resnet_n500_p50_a10_fixed.xlsx"
 
 
 def make_target_continuous(signal, noise, signal_scale=1.0, intercept=0.0, w=None):
@@ -178,22 +178,34 @@ def fit_resnet(X_train, X_test, y_train, y_test, seed):
     np.random.seed(seed)
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    scaler = StandardScaler()
-    X_train_scaled = scaler.fit_transform(X_train)
-    X_test_scaled = scaler.transform(X_test)
-
-    X_train_t = torch.tensor(X_train_scaled, dtype=torch.float32)
-    y_train_t = torch.tensor(y_train, dtype=torch.float32)
-    X_test_t = torch.tensor(X_test_scaled, dtype=torch.float32).to(device)
-
-    full_dataset = TensorDataset(X_train_t, y_train_t)
-    n_val = max(1, int(len(full_dataset) * validation_fraction))
-    n_train = len(full_dataset) - n_val
+    sn_total = len(X_train)
+    n_val = max(1, int(n_total * validation_fraction))
+    n_train = n_total - n_val
 
     split_gen = torch.Generator().manual_seed(seed)
-    train_dataset, val_dataset = random_split(
-        full_dataset, [n_train, n_val], generator=split_gen
+    train_idx, val_idx = random_split(
+        range(n_total), [n_train, n_val], generator=split_gen
     )
+
+    train_idx = np.array(train_idx.indices)
+    val_idx = np.array(val_idx.indices)
+
+    scaler = StandardScaler()
+    X_fit_scaled = scaler.fit_transform(X_train[train_idx])
+    X_val_scaled = scaler.transform(X_train[val_idx])
+    X_test_scaled = scaler.transform(X_test)
+
+    train_dataset = TensorDataset(
+        torch.tensor(X_fit_scaled, dtype=torch.float32),
+        torch.tensor(y_train[train_idx], dtype=torch.float32),
+    )
+
+    val_dataset = TensorDataset(
+        torch.tensor(X_val_scaled, dtype=torch.float32),
+        torch.tensor(y_train[val_idx], dtype=torch.float32),
+    )
+
+    X_test_t = torch.tensor(X_test_scaled, dtype=torch.float32).to(device)
 
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
@@ -225,15 +237,19 @@ def fit_resnet(X_train, X_test, y_train, y_test, seed):
             optimizer.step()
 
         model.eval()
-        val_losses = []
+        val_sse = 0.0
+        val_n = 0
+
         with torch.no_grad():
             for xb, yb in val_loader:
                 xb = xb.to(device)
                 yb = yb.to(device)
                 pred = model(xb)
-                val_losses.append(loss_fn(pred, yb).item())
 
-        val_loss = float(np.mean(val_losses))
+                val_sse += torch.sum((pred - yb) ** 2).item()
+                val_n += yb.numel()
+
+        val_loss = val_sse / val_n
 
         if val_loss < best_val_loss:
             best_val_loss = val_loss
