@@ -25,7 +25,7 @@ np.random.seed(GLOBAL_SEED)
 
 OUTPUT_DIR = Path("../results")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-EXCEL_PATH = OUTPUT_DIR / "matched_nonlinearity_resnet_n500_p50_a10_fixed.xlsx"
+EXCEL_PATH = OUTPUT_DIR / "matched_nonlinearity_resnet_n500_p50_a10_fixedV2.xlsx"
 
 
 def make_target_continuous(signal, noise, signal_scale=1.0, intercept=0.0, w=None):
@@ -178,7 +178,7 @@ def fit_resnet(X_train, X_test, y_train, y_test, seed):
     np.random.seed(seed)
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    sn_total = len(X_train)
+    n_total = len(X_train)
     n_val = max(1, int(n_total * validation_fraction))
     n_train = n_total - n_val
 
