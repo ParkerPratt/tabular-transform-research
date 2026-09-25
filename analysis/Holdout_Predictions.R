@@ -3,7 +3,7 @@ library(readxl)
 library(broom)
 
 files = list.files(
-  path = "../results",
+  path = "results",
   pattern = "matched_nonlinearity_transform",
   full.names = TRUE
 )
@@ -12,9 +12,9 @@ raw = bind_rows(lapply(files, function(f) {
   read_excel(f)
 }))
 
-hermite = read.csv("../results/matched_hermite_metrics.csv")
-curvature = read.csv("../results/matched_curvature_metrics.csv")
-inverse = read.csv("../results/inverse_polynomial_metrics.csv")
+hermite = read.csv("results/matched_hermite_metrics.csv")
+curvature = read.csv("results/matched_curvature_metrics.csv")
+inverse = read.csv("results/inverse_polynomial_metrics.csv")
 
 #Forward Direction
 analysis = raw %>%
@@ -179,7 +179,7 @@ frozen_coefficients = bind_rows(
 
 write.csv(
   frozen_coefficients,
-  "../results/frozen_model_coefficients.csv",
+  "results/frozen_model_coefficients.csv",
   row.names = FALSE
 )
 
@@ -192,7 +192,7 @@ frozen_model_fits = bind_rows(
 
 write.csv(
   frozen_model_fits,
-  "../results/frozen_model_fits.csv",
+  "results/frozen_model_fits.csv",
   row.names = FALSE
 )
 

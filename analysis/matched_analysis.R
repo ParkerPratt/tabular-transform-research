@@ -88,27 +88,42 @@ ObservedDegrade = analysis %>%
     degradation = transformed - base
   )
 
+ggplot(
+  ObservedDegrade %>%
+    filter(model == "ann"),
+  aes(x = 1 - energy1, y = -degradation, color = transform)
+) +
+  geom_smooth(method = "lm")+
+  geom_point()+
+  facet_wrap(~n)
 
-fit = lm(
-  degradation ~ log(n) + energy2 + energy3 + energy4 + energy5,
-  data = ObservedDegrade %>%
-    filter(model == "ann")
-)
-summary(fit)
+ggplot(
+  ObservedDegrade %>%
+    filter(model == "ann"),
+  aes(x = 1-energy1, y = -degradation, color = transform)
+) +
+  geom_smooth(method = "lm")+
+  geom_point()+
+  facet_wrap(~n)
+ggplot(
+  ObservedDegrade%>%
+    filter(model == "ann"),
+  aes(
+    x = 1 - energy1,
+    y = degradation,
+    color = transform,
+    linetype = factor(n)
+  )
+) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
 
+ObservedDegrade = ObservedDegrade %>%
+  mutate(nonlinear_energy = 1 - energy1)
 
-fitlinear = lm(
-  degradation ~ log(n) * (energy2 + energy3),
-  data = ObservedDegrade %>%
-    filter(model == "ann")
-)
-summary(fitlinear)
-
-curvefit = lm(
-  degradation ~ log(n) * (curvature + energy1),
-  data = ObservedDegrade %>%
-    filter(model == "ann")
-)
-
-summary(curvefit)
+ObservedDegrade %>%
+  summarize(
+    min_energy = min(nonlinear_energy),
+    max_energy = max(nonlinear_energy)
+  )
 
