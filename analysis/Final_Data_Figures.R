@@ -464,7 +464,8 @@ p_learning = ggplot(
     ),
     legend.text = element_text(size = 8.5),
     axis.title = element_text(size = 9.5),
-    axis.text = element_text(size = 8.5)
+    axis.text = element_text(size = 8.5),
+    axis.text.x = element_text(angle = 45, hjust = 1)
   )
 
 p_learning
@@ -584,7 +585,8 @@ p_learning_ci = ggplot(
     ),
     legend.text = element_text(size = 8.5),
     axis.title = element_text(size = 9.5),
-    axis.text = element_text(size = 8.5)
+    axis.text = element_text(size = 8.5),
+    axis.text.x = element_text(angle = 45, hjust = 1)
   )
 
 p_learning_ci
