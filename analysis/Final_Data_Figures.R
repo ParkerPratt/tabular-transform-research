@@ -473,7 +473,7 @@ ggsave(
   "figures/nonlinearity_r2_n.pdf",
   p_learning,
   width = 5.5,
-  height = 4.4,
+  height = 3,
   units = "in",
   device = cairo_pdf
 )
@@ -757,7 +757,8 @@ p_xgb_delta = ggplot(
     ),
     legend.text = element_text(size = 8.5),
     axis.title = element_text(size = 9.5),
-    axis.text = element_text(size = 8.5)
+    axis.text = element_text(size = 8.5),
+    axis.text.x = element_text(angle = 45, hjust = 1),
   )
 
 p_xgb_delta
@@ -880,8 +881,8 @@ p_learningAppendix = ggplot(
   ) +
   
   scale_x_log10(
-    breaks = sort(unique(LearningCurvePlot$n)),
-    labels = sort(unique(LearningCurvePlot$n))
+    breaks = c(250, 500, 1000, 2000, 5000, 10000),
+    labels = scales::label_comma()
   ) +
   
   labs(
@@ -902,9 +903,12 @@ p_learningAppendix = ggplot(
     ),
     legend.text = element_text(size = 8.5),
     axis.title = element_text(size = 9.5),
-    axis.text = element_text(size = 8.5)
+    axis.text = element_text(size = 8.5),
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    )
   )
-
 p_learningAppendix
 
 ggsave(
